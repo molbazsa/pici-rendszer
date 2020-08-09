@@ -31,7 +31,7 @@ const httpsServer = https.createServer(CREDENTIALS, app);
 (async () => {
   try {
     await mongo_client.connect();
-    const db = client.db(DBNAME);
+    const db = mongo_client.db(DBNAME);
 
     const termekCollection = db.collection("termek");
 
