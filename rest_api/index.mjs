@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 
 import mongodb from "mongodb";
-import {} from "./mongo_log.mjs";
+import { prettyInsert } from "./mongo_log.mjs";
 
 import http from "http";
 import https from "https";
@@ -41,6 +41,32 @@ const httpsServer = https.createServer(CREDENTIALS, app);
         url: req.url,
         ok: true,
       });
+    });
+
+    app.post("/new-item", async (req, res) => {
+      console.log(`Adding item: (${req.body.id}) ${req.body.name}`);
+      try {
+        const dbres = await termekCollection.insertOne({
+          _id: req.body.id,
+          name: req.body.name,
+        });
+        console.log("Added item");
+        res.json({
+          msg: `Added item: (${req.body.id}) ${req.body.name}`,
+          ok: 1,
+          id: req.body.id,
+          name: req.body.name,
+          result: prettyInsert(dbres),
+        });
+      } catch (error) {
+        console.error(error);
+        res.json({
+          msg: "Item cannot be added",
+          ok: 0,
+        });
+      } finally {
+        console.log("Response sent");
+      }
     });
 
     httpServer.listen(HTTP_PORT, () => {
