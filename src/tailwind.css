@@ -2,7 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+label {
+  @apply block;
+  @apply m-1;
+}
+
 input {
   @apply border;
   @apply m-1;
+}
+
+input.error {
+  @apply border-red-800;
+}
+
+span.input-error {
+  @apply text-red-800;
 }

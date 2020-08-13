@@ -18019,9 +18019,26 @@ video {
           animation: bounce 1s infinite;
 }
 
+label {
+  display: block;
+  margin: 0.25rem;
+}
+
 input {
   border-width: 1px;
   margin: 0.25rem;
+}
+
+input.error {
+  --border-opacity: 1;
+  border-color: #9b2c2c;
+  border-color: rgba(155, 44, 44, var(--border-opacity));
+}
+
+span.input-error {
+  --text-opacity: 1;
+  color: #9b2c2c;
+  color: rgba(155, 44, 44, var(--text-opacity));
 }
 
 @media (min-width: 640px) {
