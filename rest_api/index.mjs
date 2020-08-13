@@ -69,6 +69,16 @@ const httpsServer = https.createServer(CREDENTIALS, app);
       }
     });
 
+    app.post("/verify-item-id", async (req, res) => {
+      console.log(`Verification request: { id: "${req.body.id}" }`);
+      res.json({
+        available:
+          (await termekCollection.findOne({
+            _id: req.body.id,
+          })) === null,
+      });
+    });
+
     httpServer.listen(HTTP_PORT, () => {
       console.log(`HTTP server listening on port ${HTTP_PORT}`);
     });

@@ -4,6 +4,5 @@
 
 input {
   @apply border;
-  @apply block;
   @apply m-1;
 }
