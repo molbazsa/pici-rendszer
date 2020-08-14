@@ -4,86 +4,54 @@ import NameField from "./NewItemFormComponents/NameField.js";
 import axios from "axios";
 
 export default function NewItemForm() {
-  const useForm = () => {
-    const [submErr, setSubmError] = useState(false);
-    return {
-      get: {
-        submErr: submErr,
-      },
-      set: {
-        submErr: setSubmError,
-      },
-    };
-  };
-  const form = useForm();
+  const [incorrect, setIncorrect] = useState(false);
 
-  const useIdField = () => {
-    const [value, setValue] = useState("");
-    const [errorMsg, setErrorMsg] = useState("");
-    const [errorBefSubm, setErrorBefSubm] = useState(false);
-    return {
-      get: {
-        value: value,
-        errorMsg: errorMsg,
-        errorBefSubm: errorBefSubm,
-      },
-      set: {
-        value: setValue,
-        errorMsg: setErrorMsg,
-        errorBefSubm: setErrorBefSubm,
-      },
-    };
-  };
-  const idField = useIdField();
+  const [id, setId] = useState("");
+  const [idErr, setIdErr] = useState("length-error");
 
-  const useNameField = () => {
-    const [value, setValue] = useState("");
-    const [errorMsg, setErrorMsg] = useState("A megnevezést kötelező megadni.");
-    return {
-      get: {
-        value: value,
-        errorMsg: errorMsg,
-      },
-      set: {
-        value: setValue,
-        errorMsg: setErrorMsg,
-      },
-    };
-  };
-  const nameField = useNameField();
+  const [name, setName] = useState("");
+  const [nameErr, setNameErr] = useState("not-filled-error");
 
-  const formOnSubmit = (event) => {
+  const resetFields = () => {
+    setId("");
+    setIdErr("length-error");
+    setName("");
+    setNameErr("not-filled-error");
+  };
+
+  const submit = (event) => {
     event.preventDefault();
-    if (idField.get.errorMsg === "" && nameField.get.errorMsg === "") {
-      form.set.submErr(false);
-      (async () => {
-        console.log("Submitting new item...");
-        try {
-          const result = await axios.post("http://localhost:1111/new-item", {
-            id: idField.get.value,
-            name: nameField.get.value,
-          });
-          console.log("Submitted new item");
-          console.log("Result:");
-          console.log(result);
-          idField.set.value("");
-          nameField.set.value("");
-        } catch (error) {
-          console.error(error);
-        }
-      })();
+    if ([idErr, nameErr].every((err) => err === "no-error")) {
+      setIncorrect(false);
+      axios
+        .post("http://localhost:1111/new-item", {
+          id: id,
+          name: name,
+        })
+        .then((result) => console.log(result));
+      resetFields();
     } else {
-      form.set.submErr(true);
+      setIncorrect(true);
     }
   };
 
   return (
-    <div>
-      <form onSubmit={formOnSubmit}>
-        <IdField formState={form} state={idField} />
-        <NameField formState={form} state={nameField} />
-        <input type="submit" value="Termék felvétele" />
-      </form>
-    </div>
+    <form onSubmit={submit}>
+      <IdField
+        formIncorrect={incorrect}
+        value={id}
+        setValue={setId}
+        error={idErr}
+        setError={setIdErr}
+      />
+      <NameField
+        formIncorrect={incorrect}
+        value={name}
+        setValue={setName}
+        error={nameErr}
+        setError={setNameErr}
+      />
+      <input type="submit" value="Termék felvétele" />
+    </form>
   );
 }

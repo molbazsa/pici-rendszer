@@ -1,39 +1,38 @@
 import React from "react";
 
-export default function IdField({ formState, state }) {
-  const inputClassName = () => {
-    if (formState.get.submErr && state.get.errorMsg !== "") {
-      return "error";
-    }
-    return "";
-  };
-
-  const evaluate = (value) => {
-    if (value.length < 1) {
-      return "A megnevezést kötelező megadni.";
-    }
-    return "";
-  };
-
-  const inputOnChange = (event) => {
-    const value = event.target.value;
-    state.set.value(value);
-    const errorMsg = evaluate(value);
-    state.set.errorMsg(errorMsg);
-  };
-
+export default function NameField({
+  formIncorrect,
+  value,
+  setValue,
+  error,
+  setError,
+}) {
   return (
     <div>
-      <label htmlFor="idField">Megnevezés</label>
+      <label htmlFor="nameField">Megnevezés</label>
       <input
         type="text"
-        id="idField"
-        value={state.get.value}
-        className={inputClassName()}
-        onChange={inputOnChange}
+        id="nameField"
+        value={value}
+        onChange={(event) => {
+          setValue(event.target.value);
+          if (value === "") {
+            setError("not-filled-error");
+            return;
+          }
+          setError("no-error");
+        }}
+        className={(() => {
+          if (formIncorrect && error === "not-filled-error") return "error";
+          return "";
+        })()}
       />
       <span className="input-error">
-        {formState.get.submErr && state.get.errorMsg}
+        {(() => {
+          if (formIncorrect && error === "not-filled-error")
+            return "Kötelező mező.";
+          return "";
+        })()}
       </span>
     </div>
   );
