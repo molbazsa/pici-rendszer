@@ -34,6 +34,7 @@ const httpsServer = https.createServer(CREDENTIALS, app);
     const db = mongo_client.db(DBNAME);
 
     const termekCollection = db.collection("termek");
+    const csoportCollection = db.collection("csoport");
 
     app.get("/", (req, res) => {
       res.json({
@@ -70,10 +71,46 @@ const httpsServer = https.createServer(CREDENTIALS, app);
     });
 
     app.post("/verify-item-id", async (req, res) => {
-      console.log(`Verification request: { id: "${req.body.id}" }`);
+      console.log(`Item verification request: { id: "${req.body.id}" }`);
       res.json({
         available:
           (await termekCollection.findOne({
+            _id: req.body.id,
+          })) === null,
+      });
+    });
+
+    app.post("/new-group", async (req, res) => {
+      console.log(`Adding group: (${req.body.id}) ${req.body.name}`);
+      try {
+        const dbres = await csoportCollection.insertOne({
+          _id: req.body.id,
+          name: req.body.name,
+        });
+        console.log("Added group");
+        res.json({
+          msg: `Added group: (${req.body.id}) ${req.body.name}`,
+          ok: 1,
+          id: req.body.id,
+          name: req.body.name,
+          result: prettyInsert(dbres),
+        });
+      } catch (error) {
+        console.error(error);
+        res.json({
+          msg: "Group cannot be added",
+          ok: 0,
+        });
+      } finally {
+        console.log("Response sent");
+      }
+    });
+
+    app.post("/verify-group-id", async (req, res) => {
+      console.log(`Group verification request: { id: "${req.body.id}" }`);
+      res.json({
+        available:
+          (await csoportCollection.findOne({
             _id: req.body.id,
           })) === null,
       });

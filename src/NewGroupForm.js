@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import IdField from "./NewItemFormComponents/IdField.js";
-import NameField from "./NewItemFormComponents/NameField.js";
+import IdField from "./NewGroupFormComponents/IdField.js";
+import NameField from "./NewGroupFormComponents/NameField.js";
 import axios from "axios";
 
 export default function NewItemForm() {
@@ -24,7 +24,7 @@ export default function NewItemForm() {
     if ([idErr, nameErr].every((err) => err === "no-error")) {
       setIncorrect(false);
       axios
-        .post("http://localhost:1111/new-item", {
+        .post("http://localhost:1111/new-group", {
           id: id,
           name: name,
         })
@@ -52,7 +52,7 @@ export default function NewItemForm() {
           error={nameErr}
           setError={setNameErr}
         />
-        <input type="submit" value="Termék felvétele" />
+        <input type="submit" value="Cikkcsoport hozzáadása" />
       </form>
     </div>
   );
