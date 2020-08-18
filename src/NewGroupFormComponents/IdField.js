@@ -16,15 +16,15 @@ export default function IdField({
         id="idField"
         value={value}
         onChange={async (event) => {
-          const value = event.target.value;
-          setValue(value.match(/^[0-9]*/g)[0].slice(0, 3));
-          if (value.length !== 3) {
+          const newValue = event.target.value.match(/^[0-9]*/g)[0].slice(0, 3);
+          setValue(newValue);
+          if (newValue.length !== 3) {
             setError("length-error");
             return;
           }
           const available = (
             await axios.post("http://localhost:1111/verify-group-id", {
-              id: value,
+              id: newValue,
             })
           ).data.available;
           if (!available) {

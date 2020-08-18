@@ -18039,6 +18039,12 @@ span.input-error {
   --text-opacity: 1;
   color: #9b2c2c;
   color: rgba(155, 44, 44, var(--text-opacity));
+  margin-right: 0.25rem;
+}
+
+form {
+  margin-left: 2rem;
+  margin-bottom: 2rem;
 }
 
 @media (min-width: 640px) {

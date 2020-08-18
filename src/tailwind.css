@@ -18,4 +18,10 @@ input.error {
 
 span.input-error {
   @apply text-red-800;
+  @apply mr-1;
+}
+
+form {
+  @apply ml-8;
+  @apply mb-8;
 }

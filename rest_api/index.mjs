@@ -47,6 +47,16 @@ const httpsServer = https.createServer(CREDENTIALS, app);
     app.post("/new-item", async (req, res) => {
       console.log(`Adding item: (${req.body.id}) ${req.body.name}`);
       try {
+        const shouldAddGroup =
+          (await csoportCollection.findOne({
+            _id: req.body.id.slice(0, 3),
+          })) === null;
+        if (shouldAddGroup) {
+          await csoportCollection.insertOne({
+            _id: req.body.id.slice(0, 3),
+            name: req.body.group,
+          });
+        }
         const dbres = await termekCollection.insertOne({
           _id: req.body.id,
           name: req.body.name,
@@ -113,6 +123,27 @@ const httpsServer = https.createServer(CREDENTIALS, app);
           (await csoportCollection.findOne({
             _id: req.body.id,
           })) === null,
+      });
+    });
+
+    app.post("/verify-group-name", async (req, res) => {
+      console.log(`Group verification request: { name: "${req.body.name}" }`);
+      res.json({
+        available:
+          (await csoportCollection.findOne({
+            name: req.body.name,
+          })) === null,
+      });
+    });
+
+    app.post("/get-group-name", async (req, res) => {
+      console.log(`Sending group name for { id: "${req.body.id}" }`);
+      res.json({
+        name: (
+          await csoportCollection.findOne({
+            _id: req.body.id,
+          })
+        ).name,
       });
     });
 

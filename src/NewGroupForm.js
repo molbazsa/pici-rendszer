@@ -36,24 +36,26 @@ export default function NewItemForm() {
   };
 
   return (
-    <div className="flex">
-      <form onSubmit={submit} className="border m-1 flex-grow-0">
-        <IdField
-          formIncorrect={incorrect}
-          value={id}
-          setValue={setId}
-          error={idErr}
-          setError={setIdErr}
-        />
-        <NameField
-          formIncorrect={incorrect}
-          value={name}
-          setValue={setName}
-          error={nameErr}
-          setError={setNameErr}
-        />
-        <input type="submit" value="Cikkcsoport hozzáadása" />
-      </form>
-    </div>
+    <form onSubmit={submit}>
+      <IdField
+        formIncorrect={incorrect}
+        value={id}
+        setValue={setId}
+        error={idErr}
+        setError={setIdErr}
+      />
+      <NameField
+        formIncorrect={incorrect}
+        value={name}
+        setValue={setName}
+        error={nameErr}
+        setError={setNameErr}
+      />
+      <input
+        type="submit"
+        value="Cikkcsoport hozzáadása"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      />
+    </form>
   );
 }

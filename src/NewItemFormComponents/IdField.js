@@ -7,6 +7,11 @@ export default function IdField({
   setValue,
   error,
   setError,
+  wasAutoFilled,
+  setAutoFilled,
+  setGroup,
+  setGroupInp,
+  setGroupError,
 }) {
   return (
     <div>
@@ -16,15 +21,53 @@ export default function IdField({
         id="idField"
         value={value}
         onChange={async (event) => {
-          const value = event.target.value;
-          setValue(value.match(/^[0-9]*/g)[0].slice(0, 9));
-          if (value.length !== 9) {
+          let newValue = event.target.value.match(/^[0-9]*/g)[0].slice(0, 9);
+          if (newValue === "000") {
+            newValue = "00";
+          }
+          if (newValue.slice(3, 9) === "000000") {
+            newValue = newValue.slice(0, 8);
+          }
+          if (newValue.length < 3) {
+            setAutoFilled(false);
+          }
+          if (newValue.length >= 3) {
+            const groupId = newValue.slice(0, 3);
+            const groupAvailable = (
+              await axios.post("http://localhost:1111/verify-group-id", {
+                id: groupId,
+              })
+            ).data.available;
+            if (groupAvailable) {
+              if (!wasAutoFilled) {
+                setAutoFilled(true);
+                newValue += "000001";
+              }
+              setGroup("");
+              setGroupInp(true);
+              setGroupError("not-filled-error");
+            } else {
+              setGroup(
+                (
+                  await axios.post("http://localhost:1111/get-group-name", {
+                    id: groupId,
+                  })
+                ).data.name
+              );
+              setGroupInp(false);
+            }
+          } else {
+            setGroup("");
+            setGroupInp(false);
+          }
+          setValue(newValue);
+          if (newValue.length !== 9) {
             setError("length-error");
             return;
           }
           const available = (
             await axios.post("http://localhost:1111/verify-item-id", {
-              id: value,
+              id: newValue,
             })
           ).data.available;
           if (!available) {
