@@ -55,6 +55,7 @@ const httpsServer = https.createServer(CREDENTIALS, app);
           await csoportCollection.insertOne({
             _id: req.body.id.slice(0, 3),
             name: req.body.group,
+            count: 1,
           });
         }
         const dbres = await termekCollection.insertOne({
@@ -184,9 +185,52 @@ const httpsServer = https.createServer(CREDENTIALS, app);
             return;
           }
           res.json({
-            documents: docs,
+            documents: docs.sort((a, b) => {
+              (a = a.name), (b = b.name);
+              const atStart = (s) =>
+                s.match(new RegExp(`^${req.body.searchTerm}`, "i")) !== null;
+              if (atStart(a) && !atStart(b)) return -1;
+              if (!atStart(a) && atStart(b)) return 1;
+              return 0;
+            }),
           });
         });
+    });
+
+    app.get("/auto-group-id", async (req, res) => {
+      let count = (
+        await csoportCollection.findOne({
+          _id: "count",
+        })
+      ).count;
+      let autoId = count.toString().padStart(3, "0");
+      while (
+        (await csoportCollection.findOne({
+          _id: autoId,
+        })) !== null
+      ) {
+        count += 1;
+        autoId = count.toString().padStart(3, "0");
+        await csoportCollection.updateOne(
+          { _id: "count" },
+          { $inc: { count: 1 } }
+        );
+      }
+      res.json({
+        req: req.url,
+        autoId: autoId,
+      });
+    });
+
+    app.get("/add-group-counter", async (req, res) => {
+      await csoportCollection.insertOne({
+        _id: "count",
+        count: 1,
+      });
+      res.json({
+        req: req.url,
+        res: { ok: 1 },
+      });
     });
 
     // app.get("/add-group-search-index", async (req, res) => {

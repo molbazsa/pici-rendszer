@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import IdField from "./NewGroupFormComponents/IdField.js";
 import NameField from "./NewGroupFormComponents/NameField.js";
 import axios from "axios";
@@ -7,17 +7,26 @@ export default function NewItemForm() {
   const [incorrect, setIncorrect] = useState(false);
 
   const [id, setId] = useState("");
-  const [idErr, setIdErr] = useState("length-error");
+  useEffect(() => {
+    axios.get("http://localhost:1111/auto-group-id").then((result) => {
+      setId(result.data.autoId);
+    });
+  }, []);
+  const [idErr, setIdErr] = useState("no-error");
 
   const [name, setName] = useState("");
   const [nameErr, setNameErr] = useState("not-filled-error");
 
   const resetFields = () => {
-    setId("");
-    setIdErr("length-error");
+    axios.get("http://localhost:1111/auto-group-id").then((result) => {
+      setId(result.data.autoId);
+    });
+    setIdErr("no-error");
     setName("");
     setNameErr("not-filled-error");
   };
+
+  const idRef = useRef();
 
   const submit = (event) => {
     event.preventDefault();
@@ -28,8 +37,10 @@ export default function NewItemForm() {
           id: id,
           name: name,
         })
-        .then((result) => console.log(result));
-      resetFields();
+        .then((result) => {
+          console.log(result);
+          resetFields();
+        });
     } else {
       setIncorrect(true);
     }
@@ -38,6 +49,7 @@ export default function NewItemForm() {
   return (
     <form onSubmit={submit}>
       <IdField
+        idRef={idRef}
         formIncorrect={incorrect}
         value={id}
         setValue={setId}

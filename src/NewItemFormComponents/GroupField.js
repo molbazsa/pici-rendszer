@@ -4,18 +4,52 @@ import axios from "axios";
 export default function GroupField({
   formIncorrect,
   id,
+  idRef,
   value,
   isSearch,
   isInp,
   setValue,
   error,
   setError,
+  dropdown,
+  setDropdown,
 }) {
+  const updateDropdown = (searchTerm) => {
+    axios
+      .post("http://localhost:1111/group-name-search", {
+        searchTerm: searchTerm,
+      })
+      .then((result) => {
+        if (result.data.documents.length === 0) {
+          setDropdown("Nincs találat.");
+          return;
+        }
+        setDropdown(
+          result.data.documents.map((doc) => (
+            <p
+              key={doc._id}
+              className="hover:bg-gray-400 p-1 cursor-default"
+              onClick={() => {
+                const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                  window.HTMLInputElement.prototype,
+                  "value"
+                ).set;
+                nativeInputValueSetter.call(idRef.current, doc._id);
+                idRef.current.dispatchEvent(
+                  new Event("input", { bubbles: true })
+                );
+              }}
+            >
+              {doc._id} {doc.name}
+            </p>
+          ))
+        );
+      });
+  };
+
   const search = (
-    <div>
-      <label htmlFor="groupField">
-        Cikkcsoport - Keresés: {id.slice(0, 3)}
-      </label>
+    <div className="dropdown">
+      <label htmlFor="groupField">Cikkcsoport - Keresés:</label>
       <input
         type="text"
         id="groupField"
@@ -23,22 +57,11 @@ export default function GroupField({
         onChange={async (event) => {
           const newValue = event.target.value;
           setValue(newValue);
-          if (newValue === "") {
-            setError("not-filled-error");
-            return;
-          }
-          const available = (
-            await axios.post("http://localhost:1111/verify-group-name", {
-              name: newValue,
-            })
-          ).data.available;
-          if (!available) {
-            setError("name-unavailable-error");
-            return;
-          }
-          setError("no-error");
+          updateDropdown(newValue);
         }}
+        onFocus={(event) => updateDropdown(event.target.value)}
       />
+      <div className="dropdown-content">{dropdown}</div>
     </div>
   );
 
@@ -78,7 +101,7 @@ export default function GroupField({
           if (formIncorrect && error === "not-filled-error")
             return "Kötelező mező.";
           if (error === "name-unavailable-error")
-            return "Ez a csoport már létezik.";
+            return "Ilyen nevű cikkcsoport már létezik.";
           return "";
         })()}
       </span>

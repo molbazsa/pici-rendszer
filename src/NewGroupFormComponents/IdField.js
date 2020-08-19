@@ -7,11 +7,13 @@ export default function IdField({
   setValue,
   error,
   setError,
+  idRef,
 }) {
   return (
     <div>
       <label htmlFor="idField">Azonosító</label>
       <input
+        ref={idRef}
         type="text"
         id="idField"
         value={value}
@@ -43,6 +45,22 @@ export default function IdField({
         })()}
       />
       <span>{`(${value.length}/3)`}</span>
+      <button
+        className="ml-1 border px-1"
+        onClick={(event) => {
+          event.preventDefault();
+          axios.get("http://localhost:1111/auto-group-id").then((result) => {
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+              window.HTMLInputElement.prototype,
+              "value"
+            ).set;
+            nativeInputValueSetter.call(idRef.current, result.data.autoId);
+            idRef.current.dispatchEvent(new Event("input", { bubbles: true }));
+          });
+        }}
+      >
+        +
+      </button>
       <span className="input-error m-1">
         {(() => {
           if (formIncorrect && error === "length-error")
