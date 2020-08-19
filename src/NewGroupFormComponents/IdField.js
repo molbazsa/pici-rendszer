@@ -16,7 +16,10 @@ export default function IdField({
         id="idField"
         value={value}
         onChange={async (event) => {
-          const newValue = event.target.value.match(/^[0-9]*/g)[0].slice(0, 3);
+          let newValue = event.target.value.match(/^[0-9]*/g)[0].slice(0, 3);
+          if (newValue === "000") {
+            newValue = "00";
+          }
           setValue(newValue);
           if (newValue.length !== 3) {
             setError("length-error");

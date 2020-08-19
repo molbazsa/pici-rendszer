@@ -15,6 +15,7 @@ export default function NewItemForm() {
   const [nameErr, setNameErr] = useState("not-filled-error");
 
   const [group, setGroup] = useState("");
+  const [groupSearch, setGroupSearch] = useState(true);
   const [groupInp, setGroupInp] = useState(false);
   const [groupErr, setGroupErr] = useState("no-error");
 
@@ -25,6 +26,7 @@ export default function NewItemForm() {
     setName("");
     setNameErr("not-filled-error");
     setGroup("");
+    setGroupSearch(true);
     setGroupInp(false);
     setGroupErr("no-error");
   };
@@ -57,6 +59,7 @@ export default function NewItemForm() {
         wasAutoFilled={idAutoFilled}
         setAutoFilled={setIdAutoFilled}
         setGroup={setGroup}
+        setGroupSearch={setGroupSearch}
         setGroupInp={setGroupInp}
         setGroupError={setGroupErr}
       />
@@ -64,6 +67,7 @@ export default function NewItemForm() {
         formIncorrect={incorrect}
         id={id}
         value={group}
+        isSearch={groupSearch}
         isInp={groupInp}
         setValue={setGroup}
         error={groupErr}

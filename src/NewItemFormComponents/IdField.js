@@ -10,6 +10,7 @@ export default function IdField({
   wasAutoFilled,
   setAutoFilled,
   setGroup,
+  setGroupSearch,
   setGroupInp,
   setGroupError,
 }) {
@@ -30,6 +31,9 @@ export default function IdField({
           }
           if (newValue.length < 3) {
             setAutoFilled(false);
+            setGroupSearch(true);
+          } else {
+            setGroupSearch(false);
           }
           if (newValue.length >= 3) {
             const groupId = newValue.slice(0, 3);
@@ -55,6 +59,14 @@ export default function IdField({
                 ).data.name
               );
               setGroupInp(false);
+              if (!wasAutoFilled) {
+                newValue = (
+                  await axios.post("http://localhost:1111/auto-item-id", {
+                    groupId: groupId,
+                  })
+                ).data.autoId;
+              }
+              setAutoFilled(true);
             }
           } else {
             setGroup("");

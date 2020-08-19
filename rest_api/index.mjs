@@ -90,12 +90,37 @@ const httpsServer = https.createServer(CREDENTIALS, app);
       });
     });
 
+    app.post("/auto-item-id", async (req, res) => {
+      let count = (
+        await csoportCollection.findOne({
+          _id: req.body.groupId,
+        })
+      ).count;
+      let autoId = req.body.groupId + count.toString().padStart(6, "0");
+      while (
+        (await termekCollection.findOne({
+          _id: autoId,
+        })) !== null
+      ) {
+        count += 1;
+        autoId = req.body.groupId + count.toString().padStart(6, "0");
+        await csoportCollection.updateOne(
+          { _id: req.body.groupId },
+          { $inc: { count: 1 } }
+        );
+      }
+      res.json({
+        autoId: autoId,
+      });
+    });
+
     app.post("/new-group", async (req, res) => {
       console.log(`Adding group: (${req.body.id}) ${req.body.name}`);
       try {
         const dbres = await csoportCollection.insertOne({
           _id: req.body.id,
           name: req.body.name,
+          count: 1,
         });
         console.log("Added group");
         res.json({
@@ -146,6 +171,31 @@ const httpsServer = https.createServer(CREDENTIALS, app);
         ).name,
       });
     });
+
+    app.post("/group-name-search", (req, res) => {
+      csoportCollection
+        .find({
+          // $text: { $search: new RegExp(req.body.searchTerm) },
+          name: new RegExp(req.body.searchTerm, "i"),
+        })
+        .toArray((err, docs) => {
+          if (err) {
+            res.json({ msg: "error" });
+            return;
+          }
+          res.json({
+            documents: docs,
+          });
+        });
+    });
+
+    // app.get("/add-group-search-index", async (req, res) => {
+    //   await csoportCollection.createIndex({ name: "text" });
+    //   res.json({
+    //     req: req.url,
+    //     res: { ok: 1 },
+    //   });
+    // });
 
     httpServer.listen(HTTP_PORT, () => {
       console.log(`HTTP server listening on port ${HTTP_PORT}`);
